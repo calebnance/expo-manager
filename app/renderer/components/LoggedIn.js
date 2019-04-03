@@ -45,7 +45,7 @@ export default class LoggedIn extends Component {
   };
 
   checkIfExpo = selectedPath => {
-    const { projects } = this.state;
+    const { projects, projectsInfo } = this.state;
 
     const directory = basename(selectedPath);
 
@@ -60,7 +60,12 @@ export default class LoggedIn extends Component {
           console.log('directory', directory);
           if (!projects.includes(directory)) {
             projects.push(directory);
+            console.log('projectsInfo', projectsInfo);
+            // projectsInfo.push()
+
             localStore.set('expoProjects', projects);
+            // localStore.set('expoProjectsInfo', projectsInfo);
+
             this.setState({ projects });
           }
           console.log('filePath:', filePath);
@@ -96,34 +101,28 @@ export default class LoggedIn extends Component {
         return;
       }
 
-      // console.log('response from dialog.showOpenDialog');
-      // console.log('-----------------------------------');
-      // console.log('filePaths: ', filePaths);
-      // console.log(Array.isArray(filePaths));
-
-      // const expoProjects = localStore.get('expoProjects');
-      // console.log('expoProjects:', expoProjects);
-      const selectedPath = filePaths[0];
-      const isExpo = this.checkIfExpo(selectedPath);
-      console.log('isExpo', isExpo);
-      console.log('-----------------------------------');
-      console.log('-----------------------------------');
+      // check if expo
+      this.checkIfExpo(filePaths[0]);
     });
   };
 
   render() {
-    const { user } = this.props;
+    // const { user } = this.props;
     const { projects } = this.state;
-
-    console.log('re-render');
-    console.log(projects);
-    console.log('------------');
 
     return (
       <div>
         {/* <h2>Logged in as {user.username}</h2> */}
         <button onClick={this.handleLogout}>Logout</button>
         <button onClick={this.test}>test()</button>
+        <button
+          onClick={() => {
+            localStore.delete('expoProjects');
+            localStore.delete('expoProjectsInfo');
+          }}
+        >
+          clearLocalStorage()
+        </button>
         <button onClick={this.selectExpoDirectory}>select an expo project</button>
 
         <hr />

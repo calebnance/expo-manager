@@ -12,6 +12,7 @@ a desktop application to help manage your expo projects
 ## install
 
 `yarn install`
+`yarn postinstall`
 
 ---
 
@@ -22,8 +23,8 @@ a desktop application to help manage your expo projects
 **toggle devtools:**
 
 - osx: <kbd>cmd</kbd> <kbd>alt</kbd> <kbd>i</kbd> or <kbd>f12</kbd>
-- Linux: <kbd>ctrl</kbd> <kbd>shift</kbd> <kbd>i</kbd> or <kbd>f12</kbd>
-- Windows: <kbd>ctrl</kbd> <kbd>shift</kbd> <kbd>i</kbd> or <kbd>f12</kbd>
+- linux: <kbd>ctrl</kbd> <kbd>shift</kbd> <kbd>i</kbd> or <kbd>f12</kbd>
+- windows: <kbd>ctrl</kbd> <kbd>shift</kbd> <kbd>i</kbd> or <kbd>f12</kbd>
 
 ---
 

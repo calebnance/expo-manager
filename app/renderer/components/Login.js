@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
-export default class Login extends Component {
+export default class Login extends React.Component {
   state = {
     username: ''
   };

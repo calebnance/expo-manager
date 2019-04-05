@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 const Store = require('electron-store');
@@ -9,7 +9,10 @@ const { dialog } = require('electron').remote;
 const { exec } = require('child_process');
 const { basename } = require('path');
 
-export default class LoggedIn extends Component {
+import { Button, ContainerFlexEnd } from '../reusedStyled';
+import IconFolder from '../icons/Folder';
+
+export default class LoggedIn extends React.Component {
   state = {
     projects: localStore.get('expoProjects') !== undefined ? localStore.get('expoProjects') : [],
     projectsInfo:
@@ -113,19 +116,26 @@ export default class LoggedIn extends Component {
     return (
       <div>
         {/* <h2>Logged in as {user.username}</h2> */}
-        <button onClick={this.handleLogout}>Logout</button>
-        <button onClick={this.test}>test()</button>
-        <button
-          onClick={() => {
-            localStore.delete('expoProjects');
-            localStore.delete('expoProjectsInfo');
-          }}
-        >
-          clearLocalStorage()
-        </button>
-        <button onClick={this.selectExpoDirectory}>select an expo project</button>
-
-        <hr />
+        <ContainerFlexEnd>
+          <Button onClick={this.handleLogout}>Logout</Button>
+          <Button onClick={this.test}>test()</Button>
+          <Button
+            onClick={() => {
+              localStore.delete('expoProjects');
+              localStore.delete('expoProjectsInfo');
+              this.setState({
+                projects: [],
+                projectsInfo: {}
+              });
+            }}
+          >
+            clearLocalStorage()
+          </Button>
+          <Button onClick={this.selectExpoDirectory} svgMR="10px">
+            <IconFolder fill="#fff" />
+            select an expo project
+          </Button>
+        </ContainerFlexEnd>
 
         {projects &&
           projects.map((item, i) => {

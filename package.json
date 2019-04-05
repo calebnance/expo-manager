@@ -6,6 +6,11 @@
   "author": "Caleb Nance",
   "repository": "https://github.com/calebnance/expo-manager",
   "license": "MIT",
+  "build": {
+    "directories": {
+      "buildResources": "app/assets"
+    }
+  },
   "dependencies": {
     "@babel/register": "^7.0.0",
     "connected-react-router": "^5.0.1",

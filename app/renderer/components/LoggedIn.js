@@ -1,16 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Store from 'electron-store';
 
-const Store = require('electron-store');
+import { Button, NavBar } from '../reusedStyled';
+import IconFolder from '../icons/Folder';
+
+import { appJsonData } from '../utilities';
+
 const localStore = new Store();
 
 const fs = require('fs');
 const { dialog } = require('electron').remote;
 const { exec } = require('child_process');
 const { basename } = require('path');
-
-import { Button, ContainerFlexEnd } from '../reusedStyled';
-import IconFolder from '../icons/Folder';
 
 export default class LoggedIn extends React.Component {
   state = {
@@ -56,33 +58,71 @@ export default class LoggedIn extends React.Component {
       for (let i = 0; i < items.length; i++) {
         const filename = items[i];
         const filePath = `${selectedPath}/${filename}`;
+        const nodeModules = `${selectedPath}/node_modules/`;
 
         // is expo project?
         if (filename === 'app.json') {
-          console.log('is EXPO!');
-          console.log('directory', directory);
           if (!projects.includes(directory)) {
-            projects.push(directory);
-            console.log('projectsInfo', projectsInfo);
-            // projectsInfo.push()
+            const rawdata = fs.readFileSync(filePath);
+            const appJson = JSON.parse(rawdata);
+            const projectData = appJsonData(appJson);
 
-            localStore.set('expoProjects', projects);
-            // localStore.set('expoProjectsInfo', projectsInfo);
+            // is expo :: http://jsben.ch/WqlIl
+            if (appJson.expo !== undefined) {
+              // console.log('is EXPO!');
+              // console.log('directory', directory);
 
-            this.setState({ projects });
+              projects.push(directory);
+
+              const info = {
+                [directory]: {
+                  ...projectData,
+                  installed: fs.existsSync(nodeModules),
+                  path: selectedPath
+                }
+              };
+              const newProjectsInfo = Object.assign(projectsInfo, info);
+
+              localStore.set('expoProjects', projects);
+              localStore.set('expoProjectsInfo', newProjectsInfo);
+
+              this.setState({ projects, projectsInfo: newProjectsInfo });
+
+              const showMessageObj = {
+                detail: 'detail here',
+                icon: null,
+                message: 'message here',
+                title: 'Expo Project Added!'
+              };
+
+              if (projectData.icon !== undefined) {
+                showMessageObj.icon = `${selectedPath}/${projectData.icon}`;
+              }
+              if (projectData.name !== undefined) {
+                showMessageObj.message = projectData.name;
+                if (projectData.appVersion !== undefined) {
+                  showMessageObj.message = `${showMessageObj.message} - v${projectData.appVersion}`;
+                }
+                if (projectData.sdk !== undefined) {
+                  showMessageObj.message = `${showMessageObj.message} (Expo SDK: ${
+                    projectData.sdk
+                  })`;
+                }
+              }
+              if (projectData.description !== undefined) {
+                showMessageObj.detail = projectData.description;
+              }
+
+              dialog.showMessageBox(showMessageObj);
+            } else {
+              console.log('it is not an expo app.json file');
+            }
           }
-          console.log('filePath:', filePath);
-          console.log('filename:', filename);
-          console.log('projects', projects);
-          console.log(`${selectedPath}/assets/icon.png`);
-          console.log('-------------------------');
-          // localStore.set('expoProjects', projects);
-          // dialog.showMessageBox({
-          //   detail: 'detail here',
-          //   title: 'title here',
-          //   icon: `${selectedPath}/assets/icon.png`,
-          //   message: 'message here'
-          // });
+          // console.log('filePath:', filePath);
+          // console.log('filename:', filename);
+          // console.log('projects', projects);
+          // console.log(`${selectedPath}/assets/icon.png`);
+          // console.log('-------------------------');
           break;
         }
 
@@ -111,12 +151,13 @@ export default class LoggedIn extends React.Component {
 
   render() {
     // const { user } = this.props;
-    const { projects } = this.state;
+    const { projects, projectsInfo } = this.state;
+    console.log('projectsInfo', projectsInfo);
 
     return (
       <div>
         {/* <h2>Logged in as {user.username}</h2> */}
-        <ContainerFlexEnd>
+        <NavBar>
           <Button onClick={this.handleLogout}>Logout</Button>
           <Button onClick={this.test}>test()</Button>
           <Button
@@ -133,9 +174,9 @@ export default class LoggedIn extends React.Component {
           </Button>
           <Button onClick={this.selectExpoDirectory} svgMR="10px">
             <IconFolder fill="#fff" />
-            select an expo project
+            add expo project
           </Button>
-        </ContainerFlexEnd>
+        </NavBar>
 
         {projects &&
           projects.map((item, i) => {

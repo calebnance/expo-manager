@@ -12,7 +12,7 @@ export const Button = styled.button`
   display: flex;
   height: 46px;
   justify-content: center;
-  margin: 0 4px;
+  margin-right: 8px;
   min-width: 180px;
   padding: 10px;
 
@@ -36,4 +36,13 @@ export const ContainerFlexEnd = styled(Container)`
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+
+  button:last-child,
+  div:last-child {
+    margin-right: 0;
+  }
+`;
+
+export const NavBar = styled(ContainerFlexEnd)`
+  margin: 16px;
 `;

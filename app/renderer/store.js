@@ -11,12 +11,12 @@ export default function configureStore(initialState, routerHistory) {
 
   const actionCreators = {
     ...userActions,
-    push,
+    push
   };
 
   const reducers = {
     router: connectRouter(routerHistory),
-    user,
+    user
   };
 
   const middlewares = [thunk, router];

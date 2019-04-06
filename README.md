@@ -11,8 +11,8 @@ a desktop application to help manage your expo projects
 
 ## install
 
-`yarn install`
-`yarn postinstall`
+- `yarn install`
+- `yarn postinstall`
 
 ---
 

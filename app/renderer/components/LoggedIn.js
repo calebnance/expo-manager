@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Store from 'electron-store';
 
-import { Button, NavBar } from '../reusedStyled';
 import IconFolder from '../icons/Folder';
 
 import { appJsonData } from '../utilities';
@@ -156,11 +155,13 @@ export default class LoggedIn extends React.Component {
 
     return (
       <div>
-        {/* <h2>Logged in as {user.username}</h2> */}
-        <NavBar>
-          <Button onClick={this.handleLogout}>Logout</Button>
-          <Button onClick={this.test}>test()</Button>
-          <Button
+        <div className="d-flex justify-content-end p-2">
+          <button className="btn btn-primary mr-2" onClick={this.selectExpoDirectory}>
+            <IconFolder fill="#fff" />
+            <span className="ml-2">add expo project</span>
+          </button>
+          <button
+            className="btn btn-primary mr-2"
             onClick={() => {
               localStore.delete('expoProjects');
               localStore.delete('expoProjectsInfo');
@@ -171,17 +172,43 @@ export default class LoggedIn extends React.Component {
             }}
           >
             clearLocalStorage()
-          </Button>
-          <Button onClick={this.selectExpoDirectory} svgMR="10px">
-            <IconFolder fill="#fff" />
-            add expo project
-          </Button>
-        </NavBar>
+          </button>
+          <button className="btn btn-primary mr-2" onClick={this.test}>
+            test()
+          </button>
+          <button className="btn btn-dark" onClick={this.handleLogout}>
+            Logout
+          </button>
+        </div>
 
-        {projects &&
-          projects.map((item, i) => {
-            return <div key={i}>{item}</div>;
-          })}
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col">
+              <ul className="list-group">
+                {projects &&
+                  projects.map((item, i) => {
+                    return (
+                      <li key={i} className="list-group-item">
+                        {item}
+                      </li>
+                    );
+                  })}
+              </ul>
+            </div>
+            <div className="col-8">
+              One of three columns
+              <button
+                type="button"
+                className="btn btn-secondary"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Tooltip on top"
+              >
+                Tooltip on top
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

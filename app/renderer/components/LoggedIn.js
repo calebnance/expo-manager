@@ -9,9 +9,16 @@ import { appJsonData } from '../utilities';
 const localStore = new Store();
 
 const fs = require('fs');
-const { dialog } = require('electron').remote;
+const { remote } = require('electron');
+const { dialog, shell } = remote;
 const { exec } = require('child_process');
 const { basename } = require('path');
+
+const execute = (command, callback) => {
+  exec(command, (error, stdout, stderr) => {
+    callback(stdout, error, stderr);
+  });
+};
 
 export default class LoggedIn extends React.Component {
   state = {
@@ -36,16 +43,30 @@ export default class LoggedIn extends React.Component {
   };
 
   test = () => {
-    console.log('hit test()');
-    console.log(basename(__dirname));
-    exec('echo "The \\$HOME variable is $HOME"', (error, stdout, stderr) => {
-      if (error) {
-        console.error(`exec error: ${error}`);
-        return;
-      }
-      console.log(`stdout: ${stdout}`);
-      console.log(`stderr: ${stderr}`);
-    });
+    // open url
+    // shell.openExternal('https://github.com');
+    // open item in folder
+    // const fullPath = '/Applications/MAMP/htdocs/expo/expo-uber';
+    // shell.showItemInFolder(fullPath);
+    // shell beep
+    // shell.beep();
+    // console.log(process.execPath);
+    // console.log('hit test()');
+    // console.log(basename(__dirname));
+    // execute('ping -c 4 0.0.0.0', output => {
+    //   console.log(output);
+    // });
+    // execute('cd /Applicationssss', output => {
+    //   console.log(output);
+    // });
+    // exec('cd /Applicationssss', (error, stdout, stderr) => {
+    //   if (error) {
+    //     console.error(`exec error: ${error}`);
+    //     return;
+    //   }
+    //   console.log(`stdout: ${stdout}`);
+    //   console.log(`stderr: ${stderr}`);
+    // });
   };
 
   checkIfExpo = selectedPath => {

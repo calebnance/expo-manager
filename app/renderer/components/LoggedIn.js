@@ -45,7 +45,7 @@ export default class LoggedIn extends React.Component {
   test = () => {
     // open url
     // shell.openExternal('https://github.com');
-    // open item in folder
+    // open item in finder/explorer
     // const fullPath = '/Applications/MAMP/htdocs/expo/expo-uber';
     // shell.showItemInFolder(fullPath);
     // shell beep
@@ -58,8 +58,43 @@ export default class LoggedIn extends React.Component {
     // });
     // execute('cd /Applicationssss', output => {
     //   console.log(output);
+    //   console.log('------');
     // });
-    // exec('cd /Applicationssss', (error, stdout, stderr) => {
+
+    // execute(
+    //   'cd /Applications/MAMP/htdocs/expo/woody-blocks && yarn outdated expo --json',
+    //   (output, error) => {
+    //     console.log(output);
+    //     console.log(error);
+    //   }
+    // );
+
+    exec(
+      'cd /Applications/MAMP/htdocs/expo/woody-blocks && yarn outdated expo --json',
+      (error, stdout, stderr) => {
+        console.log(error);
+        console.log('error');
+        console.log('=======================');
+        console.log(typeof stdout);
+        console.log(stdout);
+        console.log(stderr);
+        const res = stdout.split('\n');
+        const json = JSON.parse(res[1]);
+        console.log('-----res------');
+        console.log(res);
+        console.log('json');
+        console.log(json);
+        console.log('=================');
+        // const json = JSON.parse(stdout);
+        // console.log('stdout', json.type);
+        // console.log('json', json);
+        console.log(JSON.parse(JSON.stringify(stdout)));
+        // console.log(stderr);
+        console.log('---------------------');
+      }
+    );
+
+    // exec('cd /Applications', (error, stdout, stderr) => {
     //   if (error) {
     //     console.error(`exec error: ${error}`);
     //     return;
@@ -82,13 +117,16 @@ export default class LoggedIn extends React.Component {
 
         // is expo project?
         if (filename === 'app.json') {
-          if (!projects.includes(directory)) {
+          // already a linked project?
+          if (projects.includes(directory)) {
+            console.log('already a linked project!');
+          } else {
             const rawdata = fs.readFileSync(filePath);
             const appJson = JSON.parse(rawdata);
             const projectData = appJsonData(appJson);
 
             // is expo :: http://jsben.ch/WqlIl
-            if (appJson.expo !== undefined) {
+            if ('expo' in appJson) {
               // console.log('is EXPO!');
               // console.log('directory', directory);
 
@@ -115,21 +153,23 @@ export default class LoggedIn extends React.Component {
                 title: 'Expo Project Added!'
               };
 
-              if (projectData.icon !== undefined) {
+              if ('icon' in projectData) {
                 showMessageObj.icon = `${selectedPath}/${projectData.icon}`;
               }
-              if (projectData.name !== undefined) {
+
+              if ('name' in projectData) {
                 showMessageObj.message = projectData.name;
-                if (projectData.appVersion !== undefined) {
+                if ('appVersion' in projectData) {
                   showMessageObj.message = `${showMessageObj.message} - v${projectData.appVersion}`;
                 }
-                if (projectData.sdk !== undefined) {
+                if ('sdk' in projectData) {
                   showMessageObj.message = `${showMessageObj.message} (Expo SDK: ${
                     projectData.sdk
                   })`;
                 }
               }
-              if (projectData.description !== undefined) {
+
+              if ('description' in projectData) {
                 showMessageObj.detail = projectData.description;
               }
 
@@ -172,7 +212,13 @@ export default class LoggedIn extends React.Component {
   render() {
     // const { user } = this.props;
     const { projects, projectsInfo } = this.state;
+
+    console.log('=============================');
+    console.log('=============================');
+    console.log('projects', projects);
     console.log('projectsInfo', projectsInfo);
+    console.log('=============================');
+    console.log('=============================');
 
     return (
       <div>
@@ -181,6 +227,7 @@ export default class LoggedIn extends React.Component {
             <IconFolder fill="#fff" />
             <span className="ml-2">add expo project</span>
           </button>
+
           <button
             className="btn btn-primary mr-2"
             onClick={() => {
@@ -216,6 +263,7 @@ export default class LoggedIn extends React.Component {
                   })}
               </ul>
             </div>
+
             <div className="col-8">
               One of three columns
               <button

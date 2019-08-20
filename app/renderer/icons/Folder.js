@@ -12,7 +12,7 @@ const IconFolder = ({ fill, size }) => (
 
 IconFolder.defaultProps = {
   fill: '#000',
-  size: 24
+  size: 20
 };
 
 IconFolder.propTypes = {

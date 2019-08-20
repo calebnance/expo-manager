@@ -3,29 +3,29 @@ export const appJsonData = rawData => {
   // console.log(rawData);
   const response = { expo: false };
 
-  if (rawData.expo !== undefined) {
+  if ('expo' in rawData) {
     // is expo app.json
     response.expo = true;
     const expo = rawData.expo;
 
     // app version
-    if (expo.version !== undefined) {
+    if ('version' in expo) {
       response.appVersion = expo.version;
     }
 
     // android
-    if (expo.android !== undefined) {
+    if ('android' in expo) {
       // version
-      if (expo.android.versionCode !== undefined) {
+      if ('versionCode' in expo.android) {
         response.androidVersion = expo.android.versionCode;
       }
     }
 
     // apple (ios)
-    if (expo.ios !== undefined) {
+    if ('ios' in expo) {
       response.appVersion = expo.version;
       // version
-      if (expo.ios.buildNumber !== undefined) {
+      if ('buildNumber' in expo.ios) {
         response.iosBuildNumber = expo.ios.buildNumber;
       }
     }

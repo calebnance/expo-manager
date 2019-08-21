@@ -1,6 +1,7 @@
 export const appJsonData = rawData => {
   // console.log('rawData');
   // console.log(rawData);
+
   const response = { expo: false };
 
   if ('expo' in rawData) {
@@ -54,6 +55,14 @@ export const appJsonData = rawData => {
       iconPath = iconPath.replace('./', '');
       iconPath = iconPath.replace(/^\/+/g, '');
       response.icon = iconPath;
+    }
+
+    // splash
+    if ('splash' in expo && 'image' in expo.splash) {
+      let splashPath = expo.splash.image.replace(/^(?:\.\.\/)+/, '');
+      splashPath = splashPath.replace('./', '');
+      splashPath = splashPath.replace(/^\/+/g, '');
+      response.splash = splashPath;
     }
 
     // primaryColor

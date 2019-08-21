@@ -3,29 +3,29 @@ export const appJsonData = rawData => {
   // console.log(rawData);
   const response = { expo: false };
 
-  if (rawData.expo !== undefined) {
+  if ('expo' in rawData) {
     // is expo app.json
     response.expo = true;
     const expo = rawData.expo;
 
     // app version
-    if (expo.version !== undefined) {
+    if ('version' in expo) {
       response.appVersion = expo.version;
     }
 
     // android
-    if (expo.android !== undefined) {
+    if ('android' in expo) {
       // version
-      if (expo.android.versionCode !== undefined) {
+      if ('versionCode' in expo.android) {
         response.androidVersion = expo.android.versionCode;
       }
     }
 
     // apple (ios)
-    if (expo.ios !== undefined) {
+    if ('ios' in expo) {
       response.appVersion = expo.version;
       // version
-      if (expo.ios.buildNumber !== undefined) {
+      if ('buildNumber' in expo.ios) {
         response.iosBuildNumber = expo.ios.buildNumber;
       }
     }
@@ -33,23 +33,23 @@ export const appJsonData = rawData => {
     // web :: TODO
 
     // sdk version
-    if (expo.sdkVersion !== undefined) {
+    if ('sdkVersion' in expo) {
       response.sdkLong = expo.sdkVersion;
       response.sdk = Math.trunc(parseFloat(expo.sdkVersion));
     }
 
     // name
-    if (expo.name !== undefined) {
+    if ('name' in expo) {
       response.name = expo.name;
     }
 
     // description
-    if (expo.description !== undefined) {
+    if ('description' in expo) {
       response.description = expo.description;
     }
 
     // icon
-    if (expo.icon !== undefined) {
+    if ('icon' in expo) {
       let iconPath = expo.icon.replace(/^(?:\.\.\/)+/, '');
       iconPath = iconPath.replace('./', '');
       iconPath = iconPath.replace(/^\/+/g, '');
@@ -57,7 +57,7 @@ export const appJsonData = rawData => {
     }
 
     // primaryColor
-    if (expo.primaryColor !== undefined) {
+    if ('primaryColor' in expo) {
       response.primaryColor = expo.primaryColor;
     }
   }

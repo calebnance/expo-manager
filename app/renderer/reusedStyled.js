@@ -3,7 +3,7 @@ import styled from 'styled-components';
 const brandPrimary = '#4630eb';
 const brandPrimaryHover = '#837ef7';
 
-export const Button = styled.button`
+const Button = styled.button`
   align-items: center;
   background-color: ${brandPrimary};
   border-radius: 6px;
@@ -27,22 +27,21 @@ export const Button = styled.button`
   }
 `;
 
-export const Container = styled.div`
+const Container = styled.div`
   margin: 0 auto;
+  min-width: 720px;
   max-width: 1024px;
 `;
 
-export const ContainerFlexEnd = styled(Container)`
+const ContainerFlexEnd = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
-
-  button:last-child,
-  div:last-child {
-    margin-right: 0;
-  }
+  justify-content: space-between;
+  min-width: 720px;
 `;
 
-export const NavBar = styled(ContainerFlexEnd)`
+const NavBar = styled(ContainerFlexEnd)`
   margin: 16px;
 `;
+
+export { Button, Container, ContainerFlexEnd, NavBar };

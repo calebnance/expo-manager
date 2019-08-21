@@ -2,6 +2,9 @@ import React from 'react';
 import Store from 'electron-store';
 import { appJsonData } from '../utilities';
 
+// components
+// import Toast from 'react-bootstrap/Toast';
+
 // icons
 import IconFolder from '../icons/Folder';
 
@@ -13,14 +16,15 @@ const { dialog, shell } = remote;
 const { exec } = require('child_process');
 const { basename } = require('path');
 
-const execute = (command, callback) => {
-  exec(command, (error, stdout, stderr) => {
-    callback(stdout, error, stderr);
-  });
-};
+// const execute = (command, callback) => {
+//   exec(command, (error, stdout, stderr) => {
+//     callback(stdout, error, stderr);
+//   });
+// };
 
 class Main extends React.Component {
   state = {
+    projectActive: null,
     projects: localStore.get('expoProjects') !== undefined ? localStore.get('expoProjects') : [],
     projectsInfo:
       localStore.get('expoProjectsInfo') !== undefined ? localStore.get('expoProjectsInfo') : {}
@@ -86,6 +90,12 @@ class Main extends React.Component {
     //   console.log(`stdout: ${stdout}`);
     //   console.log(`stderr: ${stderr}`);
     // });
+  };
+
+  onProjectSelect = project => {
+    this.setState({
+      projectActive: project
+    });
   };
 
   checkIfExpo = selectedPath => {
@@ -195,7 +205,7 @@ class Main extends React.Component {
 
   render() {
     // const { user } = this.props;
-    const { projects, projectsInfo } = this.state;
+    const { projectActive, projects, projectsInfo } = this.state;
 
     console.log('=============================');
     console.log('=============================');
@@ -206,11 +216,11 @@ class Main extends React.Component {
 
     return (
       <div className="container-fluid">
-        <div className="row">
-          <div className="col py-2">
+        <div className="row mb-2 py-4">
+          <div className="col">
             <h2 className="mb-0">Expo Manager</h2>
           </div>
-          <div className="col-8 py-2 d-flex align-items-center justify-content-end">
+          <div className="col-8 d-flex align-items-center justify-content-end">
             <button className="btn btn-primary mr-2" onClick={this.selectExpoDirectory}>
               <IconFolder fill="#fff" />
               <span className="ml-2">add expo project</span>
@@ -240,8 +250,20 @@ class Main extends React.Component {
             <ul className="list-group">
               {projects &&
                 projects.map((item, i) => {
+                  const details = projectsInfo[item];
+                  const iconPath = `${details.path}/${details.icon}`;
+                  const isActive = projectActive === item ? ' active' : '';
+
                   return (
-                    <li key={i} className="list-group-item">
+                    <li
+                      className={`list-group-item list-group-item-action d-flex align-items-center${isActive}`}
+                      key={i.toString()}
+                      onClick={() => this.onProjectSelect(item)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="mr-3 shadow">
+                        <img src={iconPath} height={48} width={48} />
+                      </div>
                       {item}
                     </li>
                   );
@@ -249,17 +271,30 @@ class Main extends React.Component {
             </ul>
           </div>
 
-          <div className="col-8">
-            One of three columns
-            <button
-              type="button"
-              className="btn btn-secondary"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Tooltip on top"
-            >
-              Tooltip on top
-            </button>
+          <div className="col-9">
+            <div className="card">
+              <div className="card-body">
+                {!projectActive && `Please select a project`}
+                {projectActive && (
+                  <div>
+                    <p>App description: {projectsInfo[projectActive].description}</p>
+                    <p>App Version: {projectsInfo[projectActive].appVersion}</p>
+                    <p>Expo SDK: {projectsInfo[projectActive].sdk}</p>
+                  </div>
+                )}
+              </div>
+              {/*
+              <button
+                type="button"
+                className="btn btn-secondary"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Tooltip on top"
+              >
+                Tooltip on top
+              </button>
+              */}
+            </div>
           </div>
         </div>
       </div>

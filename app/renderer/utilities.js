@@ -33,23 +33,23 @@ export const appJsonData = rawData => {
     // web :: TODO
 
     // sdk version
-    if (expo.sdkVersion !== undefined) {
+    if ('sdkVersion' in expo) {
       response.sdkLong = expo.sdkVersion;
       response.sdk = Math.trunc(parseFloat(expo.sdkVersion));
     }
 
     // name
-    if (expo.name !== undefined) {
+    if ('name' in expo) {
       response.name = expo.name;
     }
 
     // description
-    if (expo.description !== undefined) {
+    if ('description' in expo) {
       response.description = expo.description;
     }
 
     // icon
-    if (expo.icon !== undefined) {
+    if ('icon' in expo) {
       let iconPath = expo.icon.replace(/^(?:\.\.\/)+/, '');
       iconPath = iconPath.replace('./', '');
       iconPath = iconPath.replace(/^\/+/g, '');
@@ -57,7 +57,7 @@ export const appJsonData = rawData => {
     }
 
     // primaryColor
-    if (expo.primaryColor !== undefined) {
+    if ('primaryColor' in expo) {
       response.primaryColor = expo.primaryColor;
     }
   }

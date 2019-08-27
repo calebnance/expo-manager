@@ -69,6 +69,11 @@ export const appJsonData = rawData => {
     if ('primaryColor' in expo) {
       response.primaryColor = expo.primaryColor;
     }
+
+    // githubUrl
+    if ('githubUrl' in expo) {
+      response.githubUrl = expo.githubUrl;
+    }
   }
 
   // TODO

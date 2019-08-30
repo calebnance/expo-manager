@@ -1,5 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+const { exec } = require('child_process');
+const { remote } = require('electron');
+const { shell } = remote;
 
 // components
 // import Badge from 'react-bootstrap/Badge';
@@ -12,9 +15,97 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import Row from 'react-bootstrap/Row';
 
 class ProjectInfo extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.checkForUpdates = this.checkForUpdates.bind(this);
+    this.openAtom = this.openAtom.bind(this);
+    this.openVSCode = this.openVSCode.bind(this);
+    this.openDir = this.openDir.bind(this);
+    this.openGitHub = this.openGitHub.bind(this);
+  }
+
+  checkForUpdates() {
+    const { project } = this.props;
+
+    console.log('checkForUpdates()');
+    console.log('-----------------');
+    console.log('-----------------');
+    exec(`cd ${project.path} && yarn outdated expo --json`, (error, stdout, stderr) => {
+      // console.log(error);
+      // console.log('error');
+      // console.log('=======================');
+      // console.log(typeof stdout);
+      // console.log(stdout);
+      // console.log(stderr);
+      const res = stdout.split('\n');
+      console.log('-----------------');
+      console.log('-------res-------');
+      console.log(res);
+      console.log(res[0]);
+      console.log(res.length);
+      console.log('-----------------');
+      console.log('-----------------');
+      if (res.length > 1) {
+        const json = JSON.parse(res[1]);
+
+        console.log('======json=======');
+        console.log('json');
+        console.log(json);
+        console.log('=================');
+        console.log('=================');
+        console.log('=================');
+      }
+      // exec(`cd ${project.path} && yarn upgrade expo`, (error, stdout, stderr) => {
+      //   console.log('=================');
+      //   console.log('=================');
+      //   console.log('=================');
+      //   console.log('error', error);
+      //   console.log('stdout', stdout);
+      //   console.log('stderr', stderr);
+      //   console.log('=================');
+      //   console.log('=================');
+      //   console.log('=================');
+      // });
+      // const json = JSON.parse(stdout);
+      // console.log('stdout', json.type);
+      // console.log('json', json);
+      // console.log(JSON.parse(JSON.stringify(stdout)));
+      // console.log(stderr);
+      // console.log('---------------------');
+    });
+  }
+
+  openAtom() {
+    const { project } = this.props;
+
+    // open in atom editor
+    exec(`cd ${project.path} && atom .`);
+  }
+
+  openVSCode() {
+    const { project } = this.props;
+
+    // open in vscode editor
+    exec(`cd ${project.path} && code .`);
+  }
+
+  openDir() {
+    const { project } = this.props;
+
+    // open item in finder/explorer
+    shell.showItemInFolder(project.path);
+  }
+
+  openGitHub() {
+    const { project } = this.props;
+
+    // open url
+    shell.openExternal(project.githubUrl);
+  }
+
   render() {
     const { project } = this.props;
-    console.log(project);
 
     return (
       <Card>
@@ -28,11 +119,16 @@ class ProjectInfo extends React.Component {
                 </Col>
                 <Col className="d-flex align-items-center justify-content-end">
                   <ButtonGroup>
-                    <Button variant="secondary">1</Button>
-                    <Button variant="secondary">Check for package updates</Button>
+                    <Button onClick={this.checkForUpdates} variant="secondary">
+                      Check for package updates
+                    </Button>
                     <DropdownButton alignRight as={ButtonGroup} title="More..." variant="secondary">
-                      <Dropdown.Item eventKey="1">Check for package updates</Dropdown.Item>
-                      <Dropdown.Item eventKey="2">Dropdown link</Dropdown.Item>
+                      <Dropdown.Item onClick={this.openAtom}>Open with Atom</Dropdown.Item>
+                      <Dropdown.Item onClick={this.openVSCode}>Open with VSCode</Dropdown.Item>
+                      <Dropdown.Item onClick={this.openDir}>Open in directory</Dropdown.Item>
+                      {project.githubUrl && (
+                        <Dropdown.Item onClick={this.openGitHub}>Open on GitHub</Dropdown.Item>
+                      )}
                     </DropdownButton>
                   </ButtonGroup>
                 </Col>

@@ -17,7 +17,7 @@ const localStore = new Store();
 const fs = require('fs');
 const { remote } = require('electron');
 const { dialog, shell } = remote;
-const { exec } = require('child_process');
+// const { exec } = require('child_process');
 const { basename } = require('path');
 
 // const execute = (command, callback) => {
@@ -37,20 +37,11 @@ class Main extends React.Component {
   };
 
   test = () => {
-    // open url
-    // shell.openExternal('https://github.com');
-
-    // open item in finder/explorer
-    // const fullPath = '/Applications/MAMP/htdocs/expo/expo-uber';
-    // shell.showItemInFolder(fullPath);
-
     // shell beep
     // shell.beep();
-
     // console.log(process.execPath);
     // console.log('hit test()');
     // console.log(basename(__dirname));
-
     // execute('ping -c 4 0.0.0.0', output => {
     //   console.log(output);
     // });
@@ -58,43 +49,6 @@ class Main extends React.Component {
     //   console.log(output);
     //   console.log('------');
     // });
-
-    // execute(
-    //   'cd /Applications/MAMP/htdocs/expo/woody-blocks && yarn outdated expo --json',
-    //   (output, error) => {
-    //     console.log(output);
-    //     console.log(error);
-    //   }
-    // );
-
-    // 'cd /Applications/MAMP/htdocs/expo/woody-blocks && code .'
-    // 'cd /Applications/MAMP/htdocs/expo/woody-blocks && atom .'
-
-    exec(
-      'cd /Applications/MAMP/htdocs/expo/woody-blocks && yarn outdated expo --json',
-      (error, stdout, stderr) => {
-        console.log(error);
-        console.log('error');
-        console.log('=======================');
-        console.log(typeof stdout);
-        console.log(stdout);
-        console.log(stderr);
-        const res = stdout.split('\n');
-        const json = JSON.parse(res[1]);
-        console.log('-----res------');
-        console.log(res);
-        console.log('json');
-        console.log(json);
-        console.log('=================');
-        // const json = JSON.parse(stdout);
-        // console.log('stdout', json.type);
-        // console.log('json', json);
-        console.log(JSON.parse(JSON.stringify(stdout)));
-        // console.log(stderr);
-        console.log('---------------------');
-      }
-    );
-
     // exec('cd /Applications', (error, stdout, stderr) => {
     //   if (error) {
     //     console.error(`exec error: ${error}`);

@@ -12,8 +12,6 @@
     "connected-react-router": "^5.0.1",
     "electron-store": "^3.0.0",
     "history": "^4.6.3",
-    "jquery": "^3.4.0",
-    "popper.js": "^1.15.0",
     "prop-types": "^15.5.10",
     "react": "^16.2.0",
     "react-bootstrap": "^1.0.0-beta.11",

@@ -3,7 +3,11 @@ import Store from 'electron-store';
 import { appJsonData } from '../utilities';
 
 // components
-// import Toast from 'react-bootstrap/Toast';
+import Container from 'react-bootstrap/Container';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import Toast from 'react-bootstrap/Toast';
+import ProjectInfo from '../components/ProjectInfo';
 
 // icons
 import IconFolder from '../icons/Folder';
@@ -13,7 +17,7 @@ const localStore = new Store();
 const fs = require('fs');
 const { remote } = require('electron');
 const { dialog, shell } = remote;
-const { exec } = require('child_process');
+// const { exec } = require('child_process');
 const { basename } = require('path');
 
 // const execute = (command, callback) => {
@@ -24,18 +28,15 @@ const { basename } = require('path');
 
 class Main extends React.Component {
   state = {
+    // projectActive: 'expo-spotify',
     projectActive: null,
     projects: localStore.get('expoProjects') !== undefined ? localStore.get('expoProjects') : [],
     projectsInfo:
-      localStore.get('expoProjectsInfo') !== undefined ? localStore.get('expoProjectsInfo') : {}
+      localStore.get('expoProjectsInfo') !== undefined ? localStore.get('expoProjectsInfo') : {},
+    showToast: false
   };
 
   test = () => {
-    // open url
-    // shell.openExternal('https://github.com');
-    // open item in finder/explorer
-    // const fullPath = '/Applications/MAMP/htdocs/expo/expo-uber';
-    // shell.showItemInFolder(fullPath);
     // shell beep
     // shell.beep();
     // console.log(process.execPath);
@@ -48,40 +49,6 @@ class Main extends React.Component {
     //   console.log(output);
     //   console.log('------');
     // });
-
-    // execute(
-    //   'cd /Applications/MAMP/htdocs/expo/woody-blocks && yarn outdated expo --json',
-    //   (output, error) => {
-    //     console.log(output);
-    //     console.log(error);
-    //   }
-    // );
-
-    exec(
-      'cd /Applications/MAMP/htdocs/expo/woody-blocks && yarn outdated expo --json',
-      (error, stdout, stderr) => {
-        console.log(error);
-        console.log('error');
-        console.log('=======================');
-        console.log(typeof stdout);
-        console.log(stdout);
-        console.log(stderr);
-        const res = stdout.split('\n');
-        const json = JSON.parse(res[1]);
-        console.log('-----res------');
-        console.log(res);
-        console.log('json');
-        console.log(json);
-        console.log('=================');
-        // const json = JSON.parse(stdout);
-        // console.log('stdout', json.type);
-        // console.log('json', json);
-        console.log(JSON.parse(JSON.stringify(stdout)));
-        // console.log(stderr);
-        console.log('---------------------');
-      }
-    );
-
     // exec('cd /Applications', (error, stdout, stderr) => {
     //   if (error) {
     //     console.error(`exec error: ${error}`);
@@ -113,7 +80,16 @@ class Main extends React.Component {
         if (filename === 'app.json') {
           // already a linked project?
           if (projects.includes(directory)) {
-            console.log('already a linked project!');
+            shell.beep();
+            dialog.showMessageBox({
+              detail: null,
+              icon: null,
+              message: 'This project was already added!',
+              title: 'This project was already added!'
+            });
+            // console.log('already a linked project!');
+            // console.log('directory', directory);
+            // console.log(projectsInfo[directory]);
           } else {
             const rawdata = fs.readFileSync(filePath);
             const appJson = JSON.parse(rawdata);
@@ -141,9 +117,9 @@ class Main extends React.Component {
               this.setState({ projects, projectsInfo: newProjectsInfo });
 
               const showMessageObj = {
-                detail: 'detail here',
+                detail: null,
                 icon: null,
-                message: 'message here',
+                message: null,
                 title: 'Expo Project Added!'
               };
 
@@ -205,22 +181,47 @@ class Main extends React.Component {
 
   render() {
     // const { user } = this.props;
-    const { projectActive, projects, projectsInfo } = this.state;
+    const { projectActive, projects, projectsInfo, showToast } = this.state;
 
     console.log('=============================');
+    console.log('============MAIN=============');
     console.log('=============================');
     console.log('projects', projects);
     console.log('projectsInfo', projectsInfo);
     console.log('=============================');
-    console.log('=============================');
 
     return (
-      <div className="container-fluid">
-        <div className="row mb-2 py-4">
-          <div className="col">
-            <h2 className="mb-0">Expo Manager</h2>
+      <Container fluid>
+        {showToast && (
+          <div
+            aria-live="polite"
+            aria-atomic="true"
+            style={{
+              position: 'absolute',
+              top: 16,
+              right: 16,
+              zIndex: 100
+            }}
+          >
+            <Toast
+              onClose={() => this.setState({ showToast: false })}
+              show={showToast}
+              delay={3000}
+              autohide
+            >
+              <Toast.Header>
+                <strong className="mr-auto">Bootstrap</strong>
+                <small>11 mins ago</small>
+              </Toast.Header>
+              <Toast.Body>Woohoo, you're reading this text in a Toast!</Toast.Body>
+            </Toast>
           </div>
-          <div className="col-8 d-flex align-items-center justify-content-end">
+        )}
+        <Row className="mb-2 py-4">
+          <Col sm="auto" md={4}>
+            <h2 className="mb-0">Expo Manager</h2>
+          </Col>
+          <Col sm={8} md={8} className="d-flex align-items-center justify-content-end">
             <button className="btn btn-primary mr-2" onClick={this.selectExpoDirectory}>
               <IconFolder fill="#fff" />
               <span className="ml-2">add expo project</span>
@@ -242,11 +243,11 @@ class Main extends React.Component {
             <button className="btn btn-primary" onClick={this.test}>
               test()
             </button>
-          </div>
-        </div>
+          </Col>
+        </Row>
 
-        <div className="row">
-          <div className="col">
+        <Row>
+          <Col sm="auto" md={3}>
             <ul className="list-group">
               {projects &&
                 projects.map((item, i) => {
@@ -269,35 +270,13 @@ class Main extends React.Component {
                   );
                 })}
             </ul>
-          </div>
+          </Col>
 
-          <div className="col-9">
-            <div className="card">
-              <div className="card-body">
-                {!projectActive && `Please select a project`}
-                {projectActive && (
-                  <div>
-                    <p>App description: {projectsInfo[projectActive].description}</p>
-                    <p>App Version: {projectsInfo[projectActive].appVersion}</p>
-                    <p>Expo SDK: {projectsInfo[projectActive].sdk}</p>
-                  </div>
-                )}
-              </div>
-              {/*
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Tooltip on top"
-              >
-                Tooltip on top
-              </button>
-              */}
-            </div>
-          </div>
-        </div>
-      </div>
+          <Col sm={8} md={9}>
+            <ProjectInfo project={projectActive ? projectsInfo[projectActive] : null} />
+          </Col>
+        </Row>
+      </Container>
     );
   }
 }

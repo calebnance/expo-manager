@@ -41,7 +41,6 @@ app.on('ready', async () => {
 
   mainWindow = new BrowserWindow({
     backgroundColor: '#fff',
-    // show: false,
     // titleBarStyle: 'hidden',
     icon: path.resolve(path.join(__dirname, '../../assets/icon.png')),
 

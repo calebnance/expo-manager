@@ -60,8 +60,11 @@ class Main extends React.Component {
   };
 
   onProjectSelect = project => {
+    const { projectActive } = this.state;
+
+    // toggle active project selected
     this.setState({
-      projectActive: project
+      projectActive: project === projectActive ? null : project
     });
   };
 
@@ -222,13 +225,13 @@ class Main extends React.Component {
             <h2 className="mb-0">Expo Manager</h2>
           </Col>
           <Col sm={8} md={8} className="d-flex align-items-center justify-content-end">
-            <button className="btn btn-primary mr-2" onClick={this.selectExpoDirectory}>
+            <button className="btn btn-dark mr-2" onClick={this.selectExpoDirectory}>
               <IconFolder fill="#fff" />
               <span className="ml-2">add expo project</span>
             </button>
 
             <button
-              className="btn btn-primary mr-2"
+              className="btn btn-dark mr-2"
               onClick={() => {
                 localStore.delete('expoProjects');
                 localStore.delete('expoProjectsInfo');
@@ -240,7 +243,7 @@ class Main extends React.Component {
             >
               clearLocalStorage()
             </button>
-            <button className="btn btn-primary" onClick={this.test}>
+            <button className="btn btn-dark" onClick={this.test}>
               test()
             </button>
           </Col>

@@ -10,11 +10,12 @@ const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
   const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+
   for (const name of extensions) {
     try {
       await installer.default(installer[name], forceDownload);
     } catch (e) {
-      console.log(`Error installing ${name} extension: ${e.message}`);
+      console.log(`error installing ${name} extension: ${e.message}`);
     }
   }
 };
@@ -27,7 +28,7 @@ crashReporter.start({
 });
 
 app.on('window-all-closed', () => {
-  // On OS X it is common for applications and their menu bar
+  // on OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
     app.quit();
@@ -42,12 +43,13 @@ app.on('ready', async () => {
   mainWindow = new BrowserWindow({
     backgroundColor: '#fff',
     // titleBarStyle: 'hidden',
+    center: true,
     icon: path.resolve(path.join(__dirname, '../../assets/icon.png')),
 
     width: 1000,
     height: 800,
-    minWidth: 640,
-    minHeight: 480,
+    minWidth: 1000,
+    minHeight: 600,
     show: false
   });
 
@@ -59,9 +61,9 @@ app.on('ready', async () => {
   });
 
   mainWindow.webContents.on('did-finish-load', () => {
-    // Handle window logic properly on macOS:
-    // 1. App should not terminate if window has been closed
-    // 2. Click on icon in dock should re-open the window
+    // handle window logic properly on macOS:
+    // 1. app should not terminate if window has been closed
+    // 2. click on icon in dock should re-open the window
     // 3. ⌘+Q should close the window and quit the app
     if (process.platform === 'darwin') {
       mainWindow.on('close', function(e) {

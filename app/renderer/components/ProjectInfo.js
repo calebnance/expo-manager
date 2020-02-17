@@ -105,12 +105,18 @@ class ProjectInfo extends React.Component {
   }
 
   render() {
-    const { project } = this.props;
+    const { project, totalCount } = this.props;
+
+    // if no projects added yet
+    if (totalCount === 0) {
+      return null;
+    }
 
     return (
       <Card>
         <Card.Body>
           {!project && `Please select a project`}
+
           {project && (
             <React.Fragment>
               <Row className="mb-2">
@@ -125,7 +131,7 @@ class ProjectInfo extends React.Component {
                     <DropdownButton alignRight as={ButtonGroup} title="More..." variant="secondary">
                       <Dropdown.Item onClick={this.openAtom}>Open with Atom</Dropdown.Item>
                       <Dropdown.Item onClick={this.openVSCode}>Open with VSCode</Dropdown.Item>
-                      <Dropdown.Item onClick={this.openDir}>Open in directory</Dropdown.Item>
+                      <Dropdown.Item onClick={this.openDir}>Open project directory</Dropdown.Item>
                       {project.githubUrl && (
                         <Dropdown.Item onClick={this.openGitHub}>Open on GitHub</Dropdown.Item>
                       )}
@@ -147,7 +153,8 @@ class ProjectInfo extends React.Component {
 }
 
 ProjectInfo.defaultProps = {
-  project: null
+  project: null,
+  totalCount: 0
 };
 
 ProjectInfo.propTypes = {
@@ -156,7 +163,8 @@ ProjectInfo.propTypes = {
     appVersion: PropTypes.string,
     description: PropTypes.string,
     sdk: PropTypes.number
-  })
+  }),
+  totalCount: PropTypes.number
 };
 
 export default ProjectInfo;

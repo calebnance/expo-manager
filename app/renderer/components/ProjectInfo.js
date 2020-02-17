@@ -125,10 +125,10 @@ class ProjectInfo extends React.Component {
                 </Col>
                 <Col className="d-flex align-items-center justify-content-end">
                   <ButtonGroup>
-                    <Button onClick={this.checkForUpdates} variant="secondary">
+                    <Button onClick={this.checkForUpdates} variant="light">
                       Check for package updates
                     </Button>
-                    <DropdownButton alignRight as={ButtonGroup} title="More..." variant="secondary">
+                    <DropdownButton alignRight as={ButtonGroup} title="More" variant="light">
                       <Dropdown.Item onClick={this.openAtom}>Open with Atom</Dropdown.Item>
                       <Dropdown.Item onClick={this.openVSCode}>Open with VSCode</Dropdown.Item>
                       <Dropdown.Item onClick={this.openDir}>Open project directory</Dropdown.Item>
@@ -141,8 +141,12 @@ class ProjectInfo extends React.Component {
               </Row>
               <div>
                 <p>{project.description}</p>
-                <p>App Version: {project.appVersion}</p>
-                <p>Expo SDK: {project.sdk}</p>
+                <p>
+                  <strong>App Version:</strong> {project.appVersion}
+                </p>
+                <p>
+                  <strong>Expo SDK:</strong> {project.sdk}
+                </p>
               </div>
             </React.Fragment>
           )}

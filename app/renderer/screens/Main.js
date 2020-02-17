@@ -87,6 +87,7 @@ class Main extends React.Component {
 
       // already a linked project?
       if (projects.includes(directory)) {
+        // audio signal
         shell.beep();
 
         // icon in project?

@@ -11,6 +11,7 @@ import ProjectInfo from '../components/ProjectInfo';
 
 // icons
 import IconFolder from '../icons/Folder';
+import IconRefresh from '../icons/Refresh';
 
 // data
 const localStore = new Store();
@@ -184,6 +185,45 @@ class Main extends React.Component {
     });
   };
 
+  updateProjectsData = () => {
+    const { projects, projectsInfo } = this.state;
+
+    // loop through all projects and update data to most current
+    Object.values(projectsInfo).map((project, index) => {
+      const { path } = project;
+
+      const appJsonFile = `${path}/app.json`;
+      const appJsonExists = fs.existsSync(appJsonFile);
+
+      // does app.json exist?
+      if (appJsonExists) {
+        const directory = projects[index];
+        const nodeModules = `${path}/node_modules/`;
+        const installed = fs.existsSync(nodeModules);
+        const rawdata = fs.readFileSync(appJsonFile);
+        const appJson = JSON.parse(rawdata);
+        const projectData = appJsonData(appJson);
+
+        // // set project info
+        const info = {
+          [directory]: {
+            ...projectData,
+            installed,
+            path: path
+          }
+        };
+        const newProjectsInfo = Object.assign(projectsInfo, info);
+
+        // // update local storage for projects
+        localStore.set('expoProjectsInfo', newProjectsInfo);
+
+        this.setState({
+          projectsInfo: newProjectsInfo
+        });
+      }
+    });
+  };
+
   render() {
     // const { user } = this.props;
     const { projectActive, projects, projectsInfo, showToast } = this.state;
@@ -229,8 +269,13 @@ class Main extends React.Component {
           </Col>
           <Col sm={8} md={8} className="d-flex align-items-center justify-content-end">
             <button className="btn btn-dark mr-2" onClick={this.selectExpoDirectory}>
-              <IconFolder fill="#fff" />
+              <IconFolder />
               <span className="ml-2">add expo project</span>
+            </button>
+
+            <button className="btn btn-dark mr-2" onClick={this.updateProjectsData}>
+              <IconRefresh />
+              <span className="ml-2">update projects data</span>
             </button>
 
             <button

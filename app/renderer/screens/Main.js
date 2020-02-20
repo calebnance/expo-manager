@@ -3,6 +3,7 @@ import Store from 'electron-store';
 import { appJsonData } from '../utilities';
 
 // components
+import Badge from 'react-bootstrap/Badge';
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
@@ -166,9 +167,19 @@ class Main extends React.Component {
 
           dialog.showMessageBox(showMessageObj);
         } else {
-          console.log('it is not an expo app.json file');
+          // not an expo project
+          shell.beep();
+          this.setState({
+            showToast: true
+          });
         }
       }
+    } else {
+      // not an expo project
+      shell.beep();
+      this.setState({
+        showToast: true
+      });
     }
   };
 
@@ -204,7 +215,7 @@ class Main extends React.Component {
         const appJson = JSON.parse(rawdata);
         const projectData = appJsonData(appJson);
 
-        // // set project info
+        // set project info
         const info = {
           [directory]: {
             ...projectData,
@@ -214,7 +225,7 @@ class Main extends React.Component {
         };
         const newProjectsInfo = Object.assign(projectsInfo, info);
 
-        // // update local storage for projects
+        // update local storage for projects
         localStore.set('expoProjectsInfo', newProjectsInfo);
 
         this.setState({
@@ -237,37 +248,38 @@ class Main extends React.Component {
 
     return (
       <Container fluid>
-        {showToast && (
-          <div
-            aria-live="polite"
-            aria-atomic="true"
-            style={{
-              position: 'absolute',
-              top: 16,
-              right: 16,
-              zIndex: 100
-            }}
-          >
-            <Toast
-              onClose={() => this.setState({ showToast: false })}
-              show={showToast}
-              delay={3000}
-              autohide
-            >
-              <Toast.Header>
-                <strong className="mr-auto">Bootstrap</strong>
-                <small>11 mins ago</small>
-              </Toast.Header>
-              <Toast.Body>Woohoo, you&apos;re reading this text in a Toast!</Toast.Body>
-            </Toast>
-          </div>
-        )}
+        <Row className="mb-4 pt-4 pb-3 nav-header">
+          {showToast && (
+            <div aria-live="polite" aria-atomic="true" className="container-toast">
+              <Toast
+                autohide
+                delay={4000}
+                className="toast-error"
+                onClose={() => this.setState({ showToast: false })}
+                show={showToast}
+              >
+                <Toast.Header>
+                  <strong className="mr-auto">Whoops</strong>
+                  <small>just now</small>
+                </Toast.Header>
+                <Toast.Body>
+                  Looks like this isn&apos;t the <strong>root directory</strong> of an{' '}
+                  <strong>Expo</strong> app. Try another directory.
+                </Toast.Body>
+              </Toast>
+            </div>
+          )}
 
-        <Row className="mb-2 py-4">
           <Col sm="auto" md={4}>
             <h2 className="mb-0">Expo Manager</h2>
           </Col>
           <Col sm={8} md={8} className="d-flex align-items-center justify-content-end">
+            {projects && (
+              <div className="mr-4">
+                <strong>Total projects:</strong> <Badge variant="success">{projects.length}</Badge>
+              </div>
+            )}
+
             <button className="btn btn-dark mr-2" onClick={this.selectExpoDirectory}>
               <IconFolder />
               <span className="ml-2">add expo project</span>
@@ -277,7 +289,6 @@ class Main extends React.Component {
               <IconRefresh />
               <span className="ml-2">update projects data</span>
             </button>
-
             <button
               className="btn btn-dark mr-2"
               onClick={() => {
@@ -291,9 +302,12 @@ class Main extends React.Component {
             >
               clearLocalStorage()
             </button>
+
+            {/*
             <button className="btn btn-dark" onClick={this.test}>
               test()
             </button>
+            */}
           </Col>
         </Row>
 
@@ -301,7 +315,7 @@ class Main extends React.Component {
           <Col sm="auto" md={3}>
             <ul className="list-group">
               {projects &&
-                projects.map((item, i) => {
+                projects.map(item => {
                   const details = projectsInfo[item];
                   const iconPath = `${details.path}/${details.icon}`;
                   const isActive = projectActive === item ? ' active' : '';
@@ -309,7 +323,7 @@ class Main extends React.Component {
                   return (
                     <li
                       className={`list-group-item list-group-item-action d-flex align-items-center${isActive}`}
-                      key={i.toString()}
+                      key={item}
                       onClick={() => this.onProjectSelect(item)}
                       style={{ cursor: 'pointer' }}
                     >

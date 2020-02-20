@@ -5,7 +5,7 @@ const { remote } = require('electron');
 const { shell } = remote;
 
 // components
-// import Badge from 'react-bootstrap/Badge';
+import Badge from 'react-bootstrap/Badge';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Card from 'react-bootstrap/Card';
@@ -28,9 +28,9 @@ class ProjectInfo extends React.Component {
   checkForUpdates() {
     const { project } = this.props;
 
-    console.log('checkForUpdates()');
-    console.log('-----------------');
-    console.log('-----------------');
+    // console.log('checkForUpdates()');
+    // console.log('-----------------');
+    // console.log('-----------------');
     exec(`cd ${project.path} && yarn outdated expo --json`, (error, stdout, stderr) => {
       // console.log(error);
       // console.log('error');
@@ -39,22 +39,22 @@ class ProjectInfo extends React.Component {
       // console.log(stdout);
       // console.log(stderr);
       const res = stdout.split('\n');
-      console.log('-----------------');
-      console.log('-------res-------');
-      console.log(res);
-      console.log(res[0]);
-      console.log(res.length);
-      console.log('-----------------');
-      console.log('-----------------');
+      // console.log('-----------------');
+      // console.log('-------res-------');
+      // console.log(res);
+      // console.log(res[0]);
+      // console.log(res.length);
+      // console.log('-----------------');
+      // console.log('-----------------');
       if (res.length > 1) {
         const json = JSON.parse(res[1]);
 
-        console.log('======json=======');
-        console.log('json');
-        console.log(json);
-        console.log('=================');
-        console.log('=================');
-        console.log('=================');
+        // console.log('======json=======');
+        // console.log('json');
+        // console.log(json);
+        // console.log('=================');
+        // console.log('=================');
+        // console.log('=================');
       }
       // exec(`cd ${project.path} && yarn upgrade expo`, (error, stdout, stderr) => {
       //   console.log('=================');
@@ -107,8 +107,6 @@ class ProjectInfo extends React.Component {
   render() {
     const { project, totalCount } = this.props;
 
-    console.log('project', project);
-
     // if no projects added yet
     if (totalCount === 0) {
       return null;
@@ -121,7 +119,7 @@ class ProjectInfo extends React.Component {
 
           {project && (
             <React.Fragment>
-              <Row className="mb-2">
+              <Row className="mb-3">
                 <Col>
                   <h3>{project.name}</h3>
                 </Col>
@@ -141,27 +139,47 @@ class ProjectInfo extends React.Component {
                   </ButtonGroup>
                 </Col>
               </Row>
-              <div>
-                {project.description && <p>{project.description}</p>}
-                {project.appVersion && (
+
+              <Row>
+                <Col>
+                  {project.description && <p>{project.description}</p>}
+                  {project.installed && (
+                    <p>
+                      <Badge variant="primary">Is installed</Badge>
+                    </p>
+                  )}
+                  {project.primaryColor && (
+                    <div className="mB-1">
+                      <strong>Primary Color:</strong>{' '}
+                      <div
+                        className="preview-color"
+                        style={{ backgroundColor: project.primaryColor }}
+                      />{' '}
+                      {project.primaryColor}
+                    </div>
+                  )}
+                  {project.appVersion && (
+                    <p>
+                      <strong>App Version:</strong> {project.appVersion}
+                    </p>
+                  )}
                   <p>
-                    <strong>App Version:</strong> {project.appVersion}
+                    <strong>Expo SDK:</strong> {project.sdk}
                   </p>
-                )}
-                <p>
-                  <strong>Expo SDK:</strong> {project.sdk}
-                </p>
-                {project.primaryColor && (
-                  <div>
-                    <strong>Primary Color:</strong>{' '}
-                    <div
-                      className="preview-color"
-                      style={{ backgroundColor: project.primaryColor }}
-                    />{' '}
-                    {project.primaryColor}
-                  </div>
-                )}
-              </div>
+                </Col>
+                <Col className="column-align-end">
+                  {project.splash && (
+                    <div className="preview-splash">
+                      <div className="preview-splash-label">Splash screen</div>
+                      <img
+                        alt={`${project.name} splash screen`}
+                        className="preview-splash-image"
+                        src={`${project.path}/${project.splash}`}
+                      />
+                    </div>
+                  )}
+                </Col>
+              </Row>
             </React.Fragment>
           )}
         </Card.Body>

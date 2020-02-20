@@ -5,7 +5,7 @@ const { remote } = require('electron');
 const { shell } = remote;
 
 // components
-// import Badge from 'react-bootstrap/Badge';
+import Badge from 'react-bootstrap/Badge';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Card from 'react-bootstrap/Card';
@@ -15,8 +15,8 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import Row from 'react-bootstrap/Row';
 
 class ProjectInfo extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
 
     this.checkForUpdates = this.checkForUpdates.bind(this);
     this.openAtom = this.openAtom.bind(this);
@@ -28,9 +28,9 @@ class ProjectInfo extends React.Component {
   checkForUpdates() {
     const { project } = this.props;
 
-    console.log('checkForUpdates()');
-    console.log('-----------------');
-    console.log('-----------------');
+    // console.log('checkForUpdates()');
+    // console.log('-----------------');
+    // console.log('-----------------');
     exec(`cd ${project.path} && yarn outdated expo --json`, (error, stdout, stderr) => {
       // console.log(error);
       // console.log('error');
@@ -39,22 +39,22 @@ class ProjectInfo extends React.Component {
       // console.log(stdout);
       // console.log(stderr);
       const res = stdout.split('\n');
-      console.log('-----------------');
-      console.log('-------res-------');
-      console.log(res);
-      console.log(res[0]);
-      console.log(res.length);
-      console.log('-----------------');
-      console.log('-----------------');
+      // console.log('-----------------');
+      // console.log('-------res-------');
+      // console.log(res);
+      // console.log(res[0]);
+      // console.log(res.length);
+      // console.log('-----------------');
+      // console.log('-----------------');
       if (res.length > 1) {
         const json = JSON.parse(res[1]);
 
-        console.log('======json=======');
-        console.log('json');
-        console.log(json);
-        console.log('=================');
-        console.log('=================');
-        console.log('=================');
+        // console.log('======json=======');
+        // console.log('json');
+        // console.log(json);
+        // console.log('=================');
+        // console.log('=================');
+        // console.log('=================');
       }
       // exec(`cd ${project.path} && yarn upgrade expo`, (error, stdout, stderr) => {
       //   console.log('=================');
@@ -105,27 +105,33 @@ class ProjectInfo extends React.Component {
   }
 
   render() {
-    const { project } = this.props;
+    const { project, totalCount } = this.props;
+
+    // if no projects added yet
+    if (totalCount === 0) {
+      return null;
+    }
 
     return (
       <Card>
         <Card.Body>
           {!project && `Please select a project`}
+
           {project && (
             <React.Fragment>
-              <Row className="mb-2">
+              <Row className="mb-3">
                 <Col>
                   <h3>{project.name}</h3>
                 </Col>
                 <Col className="d-flex align-items-center justify-content-end">
                   <ButtonGroup>
-                    <Button onClick={this.checkForUpdates} variant="secondary">
+                    <Button onClick={this.checkForUpdates} variant="light">
                       Check for package updates
                     </Button>
-                    <DropdownButton alignRight as={ButtonGroup} title="More..." variant="secondary">
+                    <DropdownButton alignRight as={ButtonGroup} title="More" variant="light">
                       <Dropdown.Item onClick={this.openAtom}>Open with Atom</Dropdown.Item>
                       <Dropdown.Item onClick={this.openVSCode}>Open with VSCode</Dropdown.Item>
-                      <Dropdown.Item onClick={this.openDir}>Open in directory</Dropdown.Item>
+                      <Dropdown.Item onClick={this.openDir}>Open project directory</Dropdown.Item>
                       {project.githubUrl && (
                         <Dropdown.Item onClick={this.openGitHub}>Open on GitHub</Dropdown.Item>
                       )}
@@ -133,11 +139,47 @@ class ProjectInfo extends React.Component {
                   </ButtonGroup>
                 </Col>
               </Row>
-              <div>
-                <p>{project.description}</p>
-                <p>App Version: {project.appVersion}</p>
-                <p>Expo SDK: {project.sdk}</p>
-              </div>
+
+              <Row>
+                <Col>
+                  {project.description && <p>{project.description}</p>}
+                  {project.installed && (
+                    <p>
+                      <Badge variant="primary">Is installed</Badge>
+                    </p>
+                  )}
+                  {project.primaryColor && (
+                    <div className="mB-1">
+                      <strong>Primary Color:</strong>{' '}
+                      <div
+                        className="preview-color"
+                        style={{ backgroundColor: project.primaryColor }}
+                      />{' '}
+                      {project.primaryColor}
+                    </div>
+                  )}
+                  {project.appVersion && (
+                    <p>
+                      <strong>App Version:</strong> {project.appVersion}
+                    </p>
+                  )}
+                  <p>
+                    <strong>Expo SDK:</strong> {project.sdk}
+                  </p>
+                </Col>
+                <Col className="column-align-end">
+                  {project.splash && (
+                    <div className="preview-splash">
+                      <div className="preview-splash-label">Splash screen</div>
+                      <img
+                        alt={`${project.name} splash screen`}
+                        className="preview-splash-image"
+                        src={`${project.path}/${project.splash}`}
+                      />
+                    </div>
+                  )}
+                </Col>
+              </Row>
             </React.Fragment>
           )}
         </Card.Body>
@@ -147,7 +189,8 @@ class ProjectInfo extends React.Component {
 }
 
 ProjectInfo.defaultProps = {
-  project: null
+  project: null,
+  totalCount: 0
 };
 
 ProjectInfo.propTypes = {
@@ -156,7 +199,8 @@ ProjectInfo.propTypes = {
     appVersion: PropTypes.string,
     description: PropTypes.string,
     sdk: PropTypes.number
-  })
+  }),
+  totalCount: PropTypes.number
 };
 
 export default ProjectInfo;

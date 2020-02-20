@@ -3,6 +3,7 @@ import Store from 'electron-store';
 import { appJsonData } from '../utilities';
 
 // components
+import Badge from 'react-bootstrap/Badge';
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
@@ -11,14 +12,17 @@ import ProjectInfo from '../components/ProjectInfo';
 
 // icons
 import IconFolder from '../icons/Folder';
+import IconRefresh from '../icons/Refresh';
 
+// data
 const localStore = new Store();
 
+// file system
 const fs = require('fs');
 const { remote } = require('electron');
 const { dialog, shell } = remote;
-// const { exec } = require('child_process');
 const { basename } = require('path');
+// const { exec } = require('child_process');
 
 // const execute = (command, callback) => {
 //   exec(command, (error, stdout, stderr) => {
@@ -28,7 +32,6 @@ const { basename } = require('path');
 
 class Main extends React.Component {
   state = {
-    // projectActive: 'expo-spotify',
     projectActive: null,
     projects: localStore.get('expoProjects') !== undefined ? localStore.get('expoProjects') : [],
     projectsInfo:
@@ -60,110 +63,124 @@ class Main extends React.Component {
   };
 
   onProjectSelect = project => {
+    const { projectActive } = this.state;
+
+    // toggle active project selected
     this.setState({
-      projectActive: project
+      projectActive: project === projectActive ? null : project
     });
   };
 
   checkIfExpo = selectedPath => {
     const { projects, projectsInfo } = this.state;
 
+    // get base directory
     const directory = basename(selectedPath);
 
-    fs.readdir(selectedPath, (err, items) => {
-      for (let i = 0; i < items.length; i++) {
-        const filename = items[i];
-        const filePath = `${selectedPath}/${filename}`;
-        const nodeModules = `${selectedPath}/node_modules/`;
+    // set app.json path
+    const appJsonFile = `${selectedPath}/app.json`;
 
-        // is expo project?
-        if (filename === 'app.json') {
-          // already a linked project?
-          if (projects.includes(directory)) {
-            shell.beep();
-            dialog.showMessageBox({
-              detail: null,
-              icon: null,
-              message: 'This project was already added!',
-              title: 'This project was already added!'
-            });
-            // console.log('already a linked project!');
-            // console.log('directory', directory);
-            // console.log(projectsInfo[directory]);
-          } else {
-            const rawdata = fs.readFileSync(filePath);
-            const appJson = JSON.parse(rawdata);
-            const projectData = appJsonData(appJson);
+    // does app.json exist?
+    const isExpo = fs.existsSync(appJsonFile);
 
-            // is expo :: http://jsben.ch/WqlIl
-            if ('expo' in appJson) {
-              // console.log('is EXPO!');
-              // console.log('directory', directory);
+    // is it potentially expo doe?
+    if (isExpo) {
+      const nodeModules = `${selectedPath}/node_modules/`;
 
-              projects.push(directory);
+      // already a linked project?
+      if (projects.includes(directory)) {
+        // audio signal
+        shell.beep();
 
-              const info = {
-                [directory]: {
-                  ...projectData,
-                  installed: fs.existsSync(nodeModules),
-                  path: selectedPath
-                }
-              };
-              const newProjectsInfo = Object.assign(projectsInfo, info);
-
-              localStore.set('expoProjects', projects);
-              localStore.set('expoProjectsInfo', newProjectsInfo);
-
-              this.setState({ projects, projectsInfo: newProjectsInfo });
-
-              const showMessageObj = {
-                detail: null,
-                icon: null,
-                message: null,
-                title: 'Expo Project Added!'
-              };
-
-              if ('icon' in projectData) {
-                showMessageObj.icon = `${selectedPath}/${projectData.icon}`;
-              }
-
-              if ('name' in projectData) {
-                showMessageObj.message = projectData.name;
-                if ('appVersion' in projectData) {
-                  showMessageObj.message = `${showMessageObj.message} - v${projectData.appVersion}`;
-                }
-                if ('sdk' in projectData) {
-                  showMessageObj.message = `${showMessageObj.message} (Expo SDK: ${
-                    projectData.sdk
-                  })`;
-                }
-              }
-
-              if ('description' in projectData) {
-                showMessageObj.detail = projectData.description;
-              }
-
-              dialog.showMessageBox(showMessageObj);
-            } else {
-              console.log('it is not an expo app.json file');
-            }
-          }
-          // console.log('filePath:', filePath);
-          // console.log('filename:', filename);
-          // console.log('projects', projects);
-          // console.log(`${selectedPath}/assets/icon.png`);
-          // console.log('-------------------------');
-          break;
+        // icon in project?
+        let projectIcon = null;
+        if ('icon' in projectsInfo[directory]) {
+          projectIcon = `${selectedPath}/${projectsInfo[directory].icon}`;
         }
 
-        // fs.stat(file, (err, stats) => {
-        //   console.log(file);
-        //   console.log(stats['size']);
-        //   const filename = basename(file);
-        //   console.log(filename);
-        // });
+        dialog.showMessageBox({
+          detail: null,
+          icon: projectIcon,
+          message: 'This project was already added!',
+          title: 'This project was already added!'
+        });
+
+        this.setState({
+          projectActive: directory
+        });
+      } else {
+        const rawdata = fs.readFileSync(appJsonFile);
+        const appJson = JSON.parse(rawdata);
+        const projectData = appJsonData(appJson);
+
+        // is expo :: http://jsben.ch/WqlIl
+        if ('expo' in appJson) {
+          // add project
+          projects.push(directory);
+
+          // set project info
+          const info = {
+            [directory]: {
+              ...projectData,
+              installed: fs.existsSync(nodeModules),
+              path: selectedPath
+            }
+          };
+          const newProjectsInfo = Object.assign(projectsInfo, info);
+
+          // update local storage for projects
+          localStore.set('expoProjects', projects);
+          localStore.set('expoProjectsInfo', newProjectsInfo);
+
+          this.setState({
+            projectActive: directory,
+            projects,
+            projectsInfo: newProjectsInfo
+          });
+
+          const showMessageObj = {
+            detail: null,
+            icon: null,
+            message: null,
+            title: 'Expo Project Added!'
+          };
+
+          if ('icon' in projectData) {
+            showMessageObj.icon = `${selectedPath}/${projectData.icon}`;
+          }
+
+          if ('name' in projectData) {
+            showMessageObj.message = projectData.name;
+
+            if ('appVersion' in projectData) {
+              showMessageObj.message = `${showMessageObj.message} - v${projectData.appVersion}`;
+            }
+
+            if ('sdk' in projectData) {
+              showMessageObj.message = `${showMessageObj.message} (Expo SDK: ${projectData.sdk})`;
+            }
+          }
+
+          if ('description' in projectData) {
+            showMessageObj.detail = projectData.description;
+          }
+
+          dialog.showMessageBox(showMessageObj);
+        } else {
+          // not an expo project
+          shell.beep();
+          this.setState({
+            showToast: true
+          });
+        }
       }
-    });
+    } else {
+      // not an expo project
+      shell.beep();
+      this.setState({
+        showToast: true
+      });
+    }
   };
 
   selectExpoDirectory = () => {
@@ -179,56 +196,101 @@ class Main extends React.Component {
     });
   };
 
+  updateProjectsData = () => {
+    const { projects, projectsInfo } = this.state;
+
+    // loop through all projects and update data to most current
+    Object.values(projectsInfo).map((project, index) => {
+      const { path } = project;
+
+      const appJsonFile = `${path}/app.json`;
+      const appJsonExists = fs.existsSync(appJsonFile);
+
+      // does app.json exist?
+      if (appJsonExists) {
+        const directory = projects[index];
+        const nodeModules = `${path}/node_modules/`;
+        const installed = fs.existsSync(nodeModules);
+        const rawdata = fs.readFileSync(appJsonFile);
+        const appJson = JSON.parse(rawdata);
+        const projectData = appJsonData(appJson);
+
+        // set project info
+        const info = {
+          [directory]: {
+            ...projectData,
+            installed,
+            path: path
+          }
+        };
+        const newProjectsInfo = Object.assign(projectsInfo, info);
+
+        // update local storage for projects
+        localStore.set('expoProjectsInfo', newProjectsInfo);
+
+        this.setState({
+          projectsInfo: newProjectsInfo
+        });
+      }
+    });
+  };
+
   render() {
     // const { user } = this.props;
     const { projectActive, projects, projectsInfo, showToast } = this.state;
 
-    console.log('=============================');
-    console.log('============MAIN=============');
-    console.log('=============================');
-    console.log('projects', projects);
-    console.log('projectsInfo', projectsInfo);
-    console.log('=============================');
+    // console.log('=============================');
+    // console.log('============MAIN=============');
+    // console.log('=============================');
+    // console.log('projects', projects);
+    // console.log('projectsInfo', projectsInfo);
+    // console.log('=============================');
 
     return (
       <Container fluid>
-        {showToast && (
-          <div
-            aria-live="polite"
-            aria-atomic="true"
-            style={{
-              position: 'absolute',
-              top: 16,
-              right: 16,
-              zIndex: 100
-            }}
-          >
-            <Toast
-              onClose={() => this.setState({ showToast: false })}
-              show={showToast}
-              delay={3000}
-              autohide
-            >
-              <Toast.Header>
-                <strong className="mr-auto">Bootstrap</strong>
-                <small>11 mins ago</small>
-              </Toast.Header>
-              <Toast.Body>Woohoo, you're reading this text in a Toast!</Toast.Body>
-            </Toast>
-          </div>
-        )}
-        <Row className="mb-2 py-4">
+        <Row className="mb-4 pt-4 pb-3 nav-header">
+          {showToast && (
+            <div aria-live="polite" aria-atomic="true" className="container-toast">
+              <Toast
+                autohide
+                delay={4000}
+                className="toast-error"
+                onClose={() => this.setState({ showToast: false })}
+                show={showToast}
+              >
+                <Toast.Header>
+                  <strong className="mr-auto">Whoops</strong>
+                  <small>just now</small>
+                </Toast.Header>
+                <Toast.Body>
+                  Looks like this isn&apos;t the <strong>root directory</strong> of an{' '}
+                  <strong>Expo</strong> app. Try another directory.
+                </Toast.Body>
+              </Toast>
+            </div>
+          )}
+
           <Col sm="auto" md={4}>
             <h2 className="mb-0">Expo Manager</h2>
           </Col>
           <Col sm={8} md={8} className="d-flex align-items-center justify-content-end">
-            <button className="btn btn-primary mr-2" onClick={this.selectExpoDirectory}>
-              <IconFolder fill="#fff" />
+            {projects && (
+              <div className="mr-4">
+                <strong>Total projects:</strong> <Badge variant="success">{projects.length}</Badge>
+              </div>
+            )}
+
+            <button className="btn btn-dark mr-2" onClick={this.selectExpoDirectory}>
+              <IconFolder />
               <span className="ml-2">add expo project</span>
             </button>
 
+            <button className="btn btn-dark mr-2" onClick={this.updateProjectsData}>
+              <IconRefresh />
+              <span className="ml-2">update projects data</span>
+            </button>
             <button
-              className="btn btn-primary mr-2"
+              className="btn btn-dark mr-2"
               onClick={() => {
                 localStore.delete('expoProjects');
                 localStore.delete('expoProjectsInfo');
@@ -240,9 +302,12 @@ class Main extends React.Component {
             >
               clearLocalStorage()
             </button>
-            <button className="btn btn-primary" onClick={this.test}>
+
+            {/*
+            <button className="btn btn-dark" onClick={this.test}>
               test()
             </button>
+            */}
           </Col>
         </Row>
 
@@ -250,7 +315,7 @@ class Main extends React.Component {
           <Col sm="auto" md={3}>
             <ul className="list-group">
               {projects &&
-                projects.map((item, i) => {
+                projects.map(item => {
                   const details = projectsInfo[item];
                   const iconPath = `${details.path}/${details.icon}`;
                   const isActive = projectActive === item ? ' active' : '';
@@ -258,7 +323,7 @@ class Main extends React.Component {
                   return (
                     <li
                       className={`list-group-item list-group-item-action d-flex align-items-center${isActive}`}
-                      key={i.toString()}
+                      key={item}
                       onClick={() => this.onProjectSelect(item)}
                       style={{ cursor: 'pointer' }}
                     >
@@ -273,7 +338,10 @@ class Main extends React.Component {
           </Col>
 
           <Col sm={8} md={9}>
-            <ProjectInfo project={projectActive ? projectsInfo[projectActive] : null} />
+            <ProjectInfo
+              project={projectActive ? projectsInfo[projectActive] : null}
+              totalCount={projects.length}
+            />
           </Col>
         </Row>
       </Container>

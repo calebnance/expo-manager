@@ -1,0 +1,80 @@
+/* bootstrap overrides */
+.container-fluid {
+  min-width: 860px;
+}
+
+.btn-primary {
+  background-color: #4630eb;
+  border-color: #4630eb;
+}
+
+/***
+ * extend/extra styles
+ ***/
+.column-align-end {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/***
+ * navigation
+ ***/
+.nav-header {
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/***
+ * toast
+ ***/
+.container-toast {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 200;
+}
+
+.toast-error .toast-header {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.toast-error .close {
+  color: #fff;
+  text-shadow: 0 2px 0 #000;
+  opacity: 1;
+}
+
+.toast-error .toast-body {
+  background-color: #fff;
+}
+
+/***
+  * projects info
+  ***/
+.preview-color {
+  border: 1px solid #000;
+  display: inline-block;
+  height: 16px;
+  position: relative;
+  top: 2px;
+  width: 16px;
+}
+
+.preview-splash {
+  text-align: center;
+}
+
+.preview-splash-label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+
+.preview-splash-image {
+  border: 1px solid #000;
+  max-width: 300px;
+}

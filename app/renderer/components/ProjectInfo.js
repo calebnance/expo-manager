@@ -15,8 +15,8 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import Row from 'react-bootstrap/Row';
 
 class ProjectInfo extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
 
     this.checkForUpdates = this.checkForUpdates.bind(this);
     this.openAtom = this.openAtom.bind(this);
@@ -107,6 +107,8 @@ class ProjectInfo extends React.Component {
   render() {
     const { project, totalCount } = this.props;
 
+    console.log('project', project);
+
     // if no projects added yet
     if (totalCount === 0) {
       return null;
@@ -140,13 +142,25 @@ class ProjectInfo extends React.Component {
                 </Col>
               </Row>
               <div>
-                <p>{project.description}</p>
-                <p>
-                  <strong>App Version:</strong> {project.appVersion}
-                </p>
+                {project.description && <p>{project.description}</p>}
+                {project.appVersion && (
+                  <p>
+                    <strong>App Version:</strong> {project.appVersion}
+                  </p>
+                )}
                 <p>
                   <strong>Expo SDK:</strong> {project.sdk}
                 </p>
+                {project.primaryColor && (
+                  <div>
+                    <strong>Primary Color:</strong>{' '}
+                    <div
+                      className="preview-color"
+                      style={{ backgroundColor: project.primaryColor }}
+                    />{' '}
+                    {project.primaryColor}
+                  </div>
+                )}
               </div>
             </React.Fragment>
           )}

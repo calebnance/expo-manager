@@ -174,6 +174,11 @@ class Main extends React.Component {
 
     // remove from data obj
     delete projectsInfo[removeProject];
+
+    // update local storage for projects
+    localStore.set('expoProjects', projects);
+    localStore.set('expoProjectsInfo', projectsInfo);
+
     this.setState({
       projectActive: null,
       projects,
@@ -184,13 +189,6 @@ class Main extends React.Component {
   render() {
     // const { user } = this.props;
     const { projectActive, projects, projectsInfo, showToast } = this.state;
-
-    // console.log('=============================');
-    // console.log('============MAIN=============');
-    // console.log('=============================');
-    // console.log('projects', projects);
-    // console.log('projectsInfo', projectsInfo);
-    // console.log('=============================');
 
     return (
       <Container fluid>
@@ -274,10 +272,9 @@ class Main extends React.Component {
 
                   return (
                     <li
-                      className={`list-group-item list-group-item-action d-flex align-items-center${isActive}`}
+                      className={`cursor-pointer list-group-item list-group-item-action d-flex align-items-center${isActive}`}
                       key={item}
                       onClick={() => this.onProjectSelect(item)}
-                      style={{ cursor: 'pointer' }}
                     >
                       <div className="mr-3 shadow">
                         <img src={iconPath} height={48} width={48} />
@@ -289,7 +286,7 @@ class Main extends React.Component {
             </ul>
           </Col>
 
-          <Col sm={8} md={9}>
+          <Col sm={8} md={9} className="pl-0">
             <ProjectInfo
               callBack={this.projectInfoCB}
               project={projectActive ? projectsInfo[projectActive] : null}

@@ -12,7 +12,20 @@ import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Row from 'react-bootstrap/Row';
+import Tooltip from 'react-bootstrap/Tooltip';
+
+// icons
+import IconAndroid from '../icons/Android';
+import IconApple from '../icons/Apple';
+import IconGlobe from '../icons/Globe';
+
+const platformObj = {
+  android: <IconAndroid />,
+  ios: <IconApple />,
+  web: <IconGlobe />
+};
 
 class ProjectInfo extends React.Component {
   constructor() {
@@ -23,6 +36,7 @@ class ProjectInfo extends React.Component {
     this.openVSCode = this.openVSCode.bind(this);
     this.openDir = this.openDir.bind(this);
     this.openGitHub = this.openGitHub.bind(this);
+    this.displayPlatforms = this.displayPlatforms.bind(this);
   }
 
   checkForUpdates() {
@@ -104,6 +118,29 @@ class ProjectInfo extends React.Component {
     shell.openExternal(project.githubUrl);
   }
 
+  displayPlatforms() {
+    const { project } = this.props;
+
+    const platformsFormatted = project.platforms.map(platform => {
+      return (
+        <OverlayTrigger
+          key={platform}
+          placement="top"
+          overlay={
+            <Tooltip id={`tooltip-${platform}`}>
+              Supports <strong>{platform}</strong>!
+            </Tooltip>
+          }
+          trigger="hover"
+        >
+          <span className="mr-1">{platformObj[platform]}</span>
+        </OverlayTrigger>
+      );
+    });
+
+    return platformsFormatted;
+  }
+
   render() {
     const { project, totalCount } = this.props;
 
@@ -148,9 +185,26 @@ class ProjectInfo extends React.Component {
                       <Badge variant="primary">Is installed</Badge>
                     </p>
                   )}
+
+                  {project.author && (
+                    <p>
+                      <strong>Author:</strong>
+                      {` `}
+                      {project.author}
+                    </p>
+                  )}
+
+                  {project.platforms && (
+                    <p>
+                      <strong>Platforms:</strong>
+                      {` `}
+                      {this.displayPlatforms()}
+                    </p>
+                  )}
+
                   {project.primaryColor && (
-                    <div className="mB-1">
-                      <strong>Primary Color:</strong>{' '}
+                    <div className="mb-3">
+                      <strong>Primary color:</strong>{' '}
                       <div
                         className="preview-color"
                         style={{ backgroundColor: project.primaryColor }}
@@ -158,15 +212,28 @@ class ProjectInfo extends React.Component {
                       {project.primaryColor}
                     </div>
                   )}
-                  {project.appVersion && (
+
+                  {project.orientation && (
                     <p>
-                      <strong>App Version:</strong> {project.appVersion}
+                      <strong>Orientation:</strong>
+                      {` `}
+                      {project.orientation}
                     </p>
                   )}
+
                   <p>
                     <strong>Expo SDK:</strong> {project.sdk}
+                    {project.appVersion && (
+                      <React.Fragment>
+                        {` | `}
+                        <strong>App version:</strong>
+                        {` `}
+                        {project.appVersion}
+                      </React.Fragment>
+                    )}
                   </p>
                 </Col>
+
                 <Col className="column-align-end">
                   {project.splash && (
                     <div className="preview-splash">

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 const { exec } = require('child_process');
 const { remote } = require('electron');
-const { shell } = remote;
+const { dialog, shell } = remote;
 
 // components
 import Badge from 'react-bootstrap/Badge';
@@ -36,6 +36,8 @@ class ProjectInfo extends React.Component {
     this.openVSCode = this.openVSCode.bind(this);
     this.openDir = this.openDir.bind(this);
     this.openGitHub = this.openGitHub.bind(this);
+    this.removeProject = this.removeProject.bind(this);
+
     this.displayPlatforms = this.displayPlatforms.bind(this);
   }
 
@@ -118,6 +120,30 @@ class ProjectInfo extends React.Component {
     shell.openExternal(project.githubUrl);
   }
 
+  removeProject() {
+    const { callBack, project, projectActive } = this.props;
+
+    // set icon
+    let icon = null;
+    if ('icon' in project) {
+      icon = `${project.path}/${project.icon}`;
+    }
+
+    const response = dialog.showMessageBox({
+      type: 'question',
+      buttons: ['Yes', 'No'],
+      title: 'Confirm',
+      message: 'Are you sure you want to remove this project from Expo Manager?',
+      detail: "Don't worry, this does not delete any project files.",
+      icon
+    });
+
+    // yes, remove from expo manager
+    if (response === 0) {
+      callBack(projectActive);
+    }
+  }
+
   displayPlatforms() {
     const { project } = this.props;
 
@@ -172,6 +198,10 @@ class ProjectInfo extends React.Component {
                       {project.githubUrl && (
                         <Dropdown.Item onClick={this.openGitHub}>Open on GitHub</Dropdown.Item>
                       )}
+                      <Dropdown.Divider />
+                      <Dropdown.Item className="danger-zone" onClick={this.removeProject}>
+                        Remove project from Expo Manager
+                      </Dropdown.Item>
                     </DropdownButton>
                   </ButtonGroup>
                 </Col>
@@ -256,17 +286,21 @@ class ProjectInfo extends React.Component {
 }
 
 ProjectInfo.defaultProps = {
+  callBack: () => null,
   project: null,
+  projectActive: null,
   totalCount: 0
 };
 
 ProjectInfo.propTypes = {
   // optional
+  callBack: PropTypes.func,
   project: PropTypes.shape({
     appVersion: PropTypes.string,
     description: PropTypes.string,
     sdk: PropTypes.number
   }),
+  projectActive: PropTypes.string,
   totalCount: PropTypes.number
 };
 

@@ -165,6 +165,22 @@ class Main extends React.Component {
     });
   };
 
+  projectInfoCB = removeProject => {
+    const { projects, projectsInfo } = this.state;
+
+    // remove from key array
+    const projectIndex = projects.indexOf(removeProject);
+    projects.splice(projectIndex, 1);
+
+    // remove from data obj
+    delete projectsInfo[removeProject];
+    this.setState({
+      projectActive: null,
+      projects,
+      projectsInfo
+    });
+  };
+
   render() {
     // const { user } = this.props;
     const { projectActive, projects, projectsInfo, showToast } = this.state;
@@ -183,7 +199,7 @@ class Main extends React.Component {
             <div aria-live="polite" aria-atomic="true" className="container-toast">
               <Toast
                 autohide
-                delay={4000}
+                delay={7000}
                 className="toast-error"
                 onClose={() => this.setState({ showToast: false })}
                 show={showToast}
@@ -220,21 +236,26 @@ class Main extends React.Component {
               <span className="ml-2">update projects data</span>
             </button>
 
-            <button
-              className="btn btn-dark mr-2"
-              onClick={() => {
-                localStore.delete('expoProjects');
-                localStore.delete('expoProjectsInfo');
-                this.setState({
-                  projects: [],
-                  projectsInfo: {}
-                });
-              }}
-            >
-              clearLocalStorage()
-            </button>
-
             {/*
+              <button
+                className="btn btn-dark"
+                onClick={() => isExpoProject('/Applications/MAMP/htdocs/expo/expo-netflix')}
+              >
+                single package
+              </button>
+              <button
+                className="btn btn-dark mr-2"
+                onClick={() => {
+                  localStore.delete('expoProjects');
+                  localStore.delete('expoProjectsInfo');
+                  this.setState({
+                    projects: [],
+                    projectsInfo: {}
+                  });
+                }}
+              >
+                clearLocalStorage()
+              </button>
             <button className="btn btn-dark" onClick={this.test}>
               test()
             </button>
@@ -270,7 +291,9 @@ class Main extends React.Component {
 
           <Col sm={8} md={9}>
             <ProjectInfo
+              callBack={this.projectInfoCB}
               project={projectActive ? projectsInfo[projectActive] : null}
+              projectActive={projectActive}
               totalCount={projects.length}
             />
           </Col>

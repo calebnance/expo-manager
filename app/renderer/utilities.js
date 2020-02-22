@@ -35,6 +35,7 @@ export const projectExists = (projectsInfo, selectedPath) => {
 };
 
 export const isExpoProject = selectedPath => {
+  // default response
   let response = { expo: false };
 
   // set app.json path
@@ -44,10 +45,21 @@ export const isExpoProject = selectedPath => {
   if (fs.existsSync(appJsonPath)) {
     const appJsonRaw = fs.readFileSync(appJsonPath);
     const appJson = JSON.parse(appJsonRaw);
-    const expoData = appJsonData(appJson);
+    const expoData = parseAppJson(appJson);
+
+    // set package.json path
+    const packageJsonPath = `${selectedPath}/package.json`;
+    let packageData = {};
+    // does package.json exist?
+    if (fs.existsSync(packageJsonPath)) {
+      const packageJsonRaw = fs.readFileSync(packageJsonPath);
+      const packageJson = JSON.parse(packageJsonRaw);
+      packageData = parsePackageJson(packageJson);
+    }
 
     // extend data
     const extData = {
+      ...packageData,
       installed: fs.existsSync(`${selectedPath}/node_modules/`),
       path: selectedPath
     };
@@ -57,17 +69,15 @@ export const isExpoProject = selectedPath => {
   return response;
 };
 
-export const appJsonData = data => {
-  // console.log('rawData');
-  // console.log(rawData);
-
+export const parseAppJson = appData => {
+  // default response
   const response = { expo: false };
 
   // is expo :: http://jsben.ch/WqlIl
-  if ('expo' in data) {
+  if ('expo' in appData) {
     // is expo app.json
     response.expo = true;
-    const expo = data.expo;
+    const expo = appData.expo;
 
     // app version
     if ('version' in expo) {
@@ -134,12 +144,27 @@ export const appJsonData = data => {
     if ('githubUrl' in expo) {
       response.githubUrl = expo.githubUrl;
     }
+
+    // platforms
+    if ('platforms' in expo) {
+      response.platforms = expo.platforms;
+    }
+
+    // orientation
+    // https://docs.expo.io/versions/latest/workflow/configuration/#orientation
+    response.orientation = 'orientation' in expo ? expo.orientation : 'no lock';
   }
 
-  // TODO
-  // privacy
-  // platforms
-  // orientation
+  return response;
+};
+
+export const parsePackageJson = packageData => {
+  // default response
+  const response = {};
+
+  if ('author' in packageData) {
+    response.author = packageData.author;
+  }
 
   return response;
 };

@@ -8,9 +8,22 @@
   border-color: #4630eb;
 }
 
+.danger-zone {
+  background-color: #dc3545;
+  border-bottom-right-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+  color: #fff;
+  margin: -0.5rem 0;
+  padding: 0.5rem 1.5rem;
+}
+
 /***
  * extend/extra styles
  ***/
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .column-align-end {
   display: flex;
   justify-content: flex-end;
